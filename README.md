@@ -1,4 +1,4 @@
 shoutcast-android
 =================
 
-A simple ShoutCast Radio streaming app for Android
+Simple ShoutCast Radio 7 streaming app for Android
