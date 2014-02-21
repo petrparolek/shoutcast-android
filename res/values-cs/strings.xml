@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Radio 7</string>
+    <string name="action_settings">Nastavení</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="fetching_song">Retrieving song</string>
+    <string name="play">Spustit</string>
+    <string name="stop">Zastavit</string>
+    <string name="now_playing">Přehrává se Radio 7</string>
+    <string name="buffering">Načítání…</string>
+    <string name="ticker_text">Načítání</string>
+
+</resources>
