@@ -8,7 +8,8 @@
     <string name="play">Spustit</string>
     <string name="stop">Zastavit</string>
     <string name="now_playing">Přehrává se Radio 7</string>
-    <string name="buffering">Načítání…</string>
     <string name="ticker_text">Načítání</string>
+    <string name="buffering">Načítání…</string>
+    
 
 </resources>
