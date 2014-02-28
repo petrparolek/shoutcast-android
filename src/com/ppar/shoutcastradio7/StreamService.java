@@ -8,11 +8,11 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-//import android.content.SharedPreferences;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.IBinder;
-//import android.preference.PreferenceManager;
+import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -22,8 +22,8 @@ public class StreamService extends Service {
 	private static MediaPlayer mp;
 	boolean isPlaying;
 	private static String url = "http://icecast1.play.cz:8000/Radio7-128aac";
-	//SharedPreferences prefs;
-	//SharedPreferences.Editor editor;
+	SharedPreferences prefs;
+	SharedPreferences.Editor editor;
 	Notification n;
 	NotificationManager notificationManager;
 	// Change this int to some number specifically for this app
@@ -42,8 +42,8 @@ public class StreamService extends Service {
 		Log.d(TAG, "onCreate");
 		
 		// Init the SharedPreferences and Editor
-		//prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		//editor = prefs.edit();
+		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		editor = prefs.edit();
 		
 		// Set up the buffering notification
 		notificationManager = (NotificationManager) getApplicationContext()
@@ -97,77 +97,12 @@ public class StreamService extends Service {
 	    //detect voice incoming call
 	    //onCallStateChanged method will be executed if there's incoming
 	    //or outcoming call
-	    PhoneStateListener phoneStateListener = new PhoneStateListener() {
-	        @Override
-	        public void onCallStateChanged(int state, String incomingNumber) {
-	            if (state == TelephonyManager.CALL_STATE_RINGING) {
-	                //INCOMING call
-	                //do all necessary action to pause the audio
-	                if(mp!=null){//check mp
-	                    //setPlayerButton(true, false, true);
-
-	                    if(mp.isPlaying()){ 
-	                        mp.stop();
-	                        mp.release();
-	                		mp = null;
-	                    }
-	                }
-
-	            } else if(state == TelephonyManager.CALL_STATE_IDLE) {
-	                //Not IN CALL
-	                //do anything if the phone-state is idle
-	            	//play();
-	            	if(mp==null){
-	            		mp = new MediaPlayer();        		
-	            
-	            	mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
-	        		try {
-	        			mp.setDataSource(url);
-	        			mp.prepare();
-	        		} catch (IllegalArgumentException e) {
-	        			// TODO Auto-generated catch block
-	        			e.printStackTrace();
-	        		} catch (SecurityException e) {
-	        			// TODO Auto-generated catch block
-	        			Log.e(TAG, "SecurityException");
-	        		} catch (IllegalStateException e) {
-	        			// TODO Auto-generated catch block
-	        			Log.e(TAG, "IllegalStateException");
-	        		} catch (IOException e) {
-	        			// TODO Auto-generated catch block
-	        			Log.e(TAG, "IOException");
-	        		}
-	            	mp.start();
-	            	}
-	            } else if(state == TelephonyManager.CALL_STATE_OFFHOOK) {
-	                //A call is dialing, active or on hold
-	                //do all necessary action to pause the audio
-	                //do something here
-	                if(mp!=null){//check mp
-	                    //setPlayerButton(true, false, true);
-
-	                    if(mp.isPlaying()){ 
-	                        mp.stop();
-	                        mp.release();
-	                		mp = null;
-	                    }
-	                }
-	            }
-	            super.onCallStateChanged(state, incomingNumber);
-	        }
-	    };//end PhoneStateListener
-
-	    TelephonyManager mgr = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-	    if(mgr != null) {
-	        mgr.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
-	    }
-		
-		
+	   
 		Log.d(TAG, "onStart");
-		mp.start();
+		//mp.start();
 		// Set the isPlaying preference to true
-		//editor.putBoolean("isPlaying", true);
-		//editor.commit();
+		editor.putBoolean("isPlaying", true);
+		editor.commit();
 		
 		Context context = getApplicationContext();
 		String notifTitle = context.getResources().getString(R.string.app_name);
@@ -184,6 +119,72 @@ public class StreamService extends Service {
 		n.setLatestEventInfo(context, notifTitle, notifMessage, pIntent);
 		// Change 5315 to some nother number
 		notificationManager.notify(notifId, n);
+		
+		PhoneStateListener phoneStateListener = new PhoneStateListener() {
+			@Override
+			public void onCallStateChanged(int state, String incomingNumber) {
+				if (state == TelephonyManager.CALL_STATE_RINGING) {
+					// INCOMING call
+					// do all necessary action to pause the audio
+					if (mp != null) {// check mp
+						// setPlayerButton(true, false, true);
+
+						if (mp.isPlaying()) {
+							mp.stop();
+							mp.release();
+							mp = null;
+						}
+					}
+
+				} else if (state == TelephonyManager.CALL_STATE_IDLE) {
+					// Not IN CALL
+					// do anything if the phone-state is idle
+					// play();
+					if (mp == null) {
+						mp = new MediaPlayer();
+
+						mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+						try {
+							mp.setDataSource(url);
+							mp.prepare();
+							mp.start();
+						} catch (IllegalArgumentException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (SecurityException e) {
+							// TODO Auto-generated catch block
+							Log.e(TAG, "SecurityException");
+						} catch (IllegalStateException e) {
+							// TODO Auto-generated catch block
+							Log.e(TAG, "IllegalStateException");
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							Log.e(TAG, "IOException");
+						}
+					}
+				} else if (state == TelephonyManager.CALL_STATE_OFFHOOK) {
+					// A call is dialing, active or on hold
+					// do all necessary action to pause the audio
+					// do something here
+					if (mp != null) {// check mp
+						// setPlayerButton(true, false, true);
+
+						if (mp.isPlaying()) {
+							mp.stop();
+							mp.release();
+							mp = null;
+						}
+					}
+				}
+				super.onCallStateChanged(state, incomingNumber);
+			}
+		};// end PhoneStateListener
+
+		TelephonyManager mgr = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+		if (mgr != null) {
+			mgr.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+		}
+		mp.start();
 	}
 	
 	@Override
@@ -192,8 +193,8 @@ public class StreamService extends Service {
 		mp.stop();
 		mp.release();
 		mp = null;
-		//editor.putBoolean("isPlaying", false);
-		//editor.commit();
+		editor.putBoolean("isPlaying", false);
+		editor.commit();
 		notificationManager.cancel(notifId);
 	}
 
